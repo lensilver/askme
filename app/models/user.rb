@@ -3,16 +3,22 @@ require 'openssl'
 class User < ApplicationRecord
   ITERATIONS = 20_000
   DIGEST = OpenSSL::Digest::SHA256.new
+  USERNAME_VALIDATION = /\A\w+\z/
   
   attr_accessor :password
   has_many :questions	
 
   validates :email, :username, presence: true
   validates :email, :username, uniqueness: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
+
+  validates :username, length: { maximum: 40 }
+  validates :username, format: { with: USERNAME_VALIDATION }  
 
   validates :password, presence: true, on: :create
   validates :password, confirmation: true
 
+  before_validation :username_downcase, :email_downcase
   before_save :encrypt_password
 
   # Служебный метод, преобразующий бинарную строку в шестнадцатиричный формат,
@@ -68,4 +74,11 @@ def encrypt_password
     end
   end
 
+  def username_downcase
+    username&.downcase!
+  end
+
+  def email_downcase
+    email&.downcase!
+  end
 end
