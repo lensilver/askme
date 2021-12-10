@@ -26,7 +26,9 @@
 </div>
 
 <div class="question question-content question-text text-lead">
-  <p>У вас всего <%= @questions_amount%> <%= inclination(@questions_amount, 'вопрос', 'вопроса', 'вопросов') %></p>  
+  <p>У вас всего: <%= @questions_amount%> <%= inclination(@questions_amount, 'вопрос', 'вопроса', 'вопросов') %></p>
+  <p>Отвечено на: <%= @answers_amount%> <%= inclination(@answers_amount, 'вопрос', 'вопроса', 'вопросов') %></p> 
+  <p>Без ответа: <%= @unanswered_amount %> <%= inclination(@unanswered_amount, 'вопрос', 'вопроса', 'вопросов') %></p>
 </div>
 
 <%# Блок с формой для задавания пользователю вопроса %>

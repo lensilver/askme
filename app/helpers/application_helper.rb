@@ -11,17 +11,10 @@ module ApplicationHelper
 end
 
 def inclination(number, vopros, voprosa, voprosov)
-  if (11..14).include?(number % 100)
-    return voprosov
-  end
-    ostatok = number % 10
-  if ostatok == 1
-    return vopros
-  end
-  if ostatok.between?(2,4)
-    return voprosa
-  end
-  if ostatok.between?(5,9) || ostatok == 0
-    return voprosov
-  end
+  result = number % 10 unless (11..14).include?(number % 100)
+    case result
+    when 1 then vopros
+    when 2..4 then voprosa
+    else voprosov
+    end
 end
