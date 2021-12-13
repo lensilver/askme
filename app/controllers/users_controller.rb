@@ -1,43 +1,76 @@
 class UsersController < ApplicationController
+  before_action :load_user, except: [:index, :create, :new]
+
+  before_action :authorize_user, except: [:index, :new, :create, :show]
+
   def index
-    @users = [
-    User.new(
-      id: 1,
-      name: 'Vadim',
-      username: 'installero',
-      avatar_url: 'https://secure.gravatar.com/avatar/' \
-        '71269686e0f757ddb4f73614f43ae445?s=100'
-    ),
-    User.new(id: 2, name: 'Misha', username: 'aristofun')
-  ]
+    @users = User.all
   end
 
   def new
+    # Если юзер залогинен, отправляем его на главную с сообщением
+    redirect_to root_url, alert: 'Вы уже залогинены' if current_user.present?
+
+    # Иначе, создаем болванку нового пользователя.
+    @user = User.new
+  end
+
+  def create
+    redirect_to root_url, alert: 'Вы уже залогинены' if current_user.present?
+    @user = User.new(user_params)
+
+    if @user.save
+      redirect_to root_url, notice: 'Пользователь успешно зарегистрирован!'
+    else
+      render 'new'
+    end
   end
 
   def edit
   end
 
-  def show
-    @user = User.new(
-    name: 'Vadim',
-    username: 'installero',
-    avatar_url: 'https://secure.gravatar.com/avatar/' \
-      '71269686e0f757ddb4f73614f43ae445?s=100'
-  )
+  def update
+    # пытаемся обновить юзера
+    if @user.update(user_params)
+      # Если получилось, отправляем пользователя на его страницу с сообщением
+      redirect_to user_path(@user), notice: 'Данные обновлены'
+    else
+      # Если не получилось, как и в create, рисуем страницу редактирования
+      # пользователя со списком ошибок
+      render 'edit'
+    end
+  end
 
-    @questions = [
-      Question.new(text: 'Как дела?', answer: 'OK', created_at: Date.parse('27.03.2016')),
-      Question.new(text: 'В чем смысл жизни?', answer: '42', created_at: Date.parse('27.03.2016')),
-      Question.new(text: 'How Much Is The Fish?', created_at: Date.parse('27.03.2016')),
-      Question.new(text: 'What is my ip?', created_at: Date.parse('27.03.2016')),
-      Question.new(text: 'ZZ Top is dinozauros?', created_at: Date.parse('27.03.2016'))
-    ]
-    
+  def show
+    # берём вопросы у найденного юзера
+    @questions = @user.questions.order(created_at: :desc)
+
+    # Для формы нового вопроса создаём заготовку, вызывая build у результата вызова метода @user.questions.
+    @new_question = @user.questions.build
+
     @questions_amount = @questions.count
     @answers_amount = @questions.count(&:answer)
     @unanswered_amount = @questions_amount - @answers_amount
 
     @new_question = Question.new
+  end
+
+  private
+
+  def authorize_user
+    reject_user unless @user == current_user
+  end
+
+  def load_user
+    # защищаем от повторной инициализации с помощью ||=
+    @user ||= User.find params[:id]
+  end
+
+  def user_params
+    # берём объект params, потребуем у него иметь ключ
+    # :user, у него с помощью метода permit разрешаем
+    # набор инпутов. Ничего лишнего, кроме них, в пользователя не попадёт
+    params.require(:user).permit(:email, :password, :password_confirmation,
+                               :name, :username, :avatar_url)
   end
 end
