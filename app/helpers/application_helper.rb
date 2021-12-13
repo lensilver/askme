@@ -8,13 +8,17 @@ module ApplicationHelper
       asset_path 'avatar.jpg'
     end
   end
-end
 
-def inclination(number, vopros, voprosa, voprosov)
-  result = number % 10 unless (11..14).include?(number % 100)
-    case result
-    when 1 then vopros
-    when 2..4 then voprosa
-    else voprosov
-    end
+  def inclination(number, vopros, voprosa, voprosov)
+    result = number % 10 unless (11..14).include?(number % 100)
+      case result
+      when 1 then vopros
+      when 2..4 then voprosa
+      else voprosov
+      end
+  end
+
+  def fa_icon(icon_class)
+    content_tag 'span', '', class: "fa fa-#{icon_class}"
+  end
 end
