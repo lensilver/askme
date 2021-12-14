@@ -31,7 +31,7 @@ class User < ApplicationRecord
   # если пользователь с такой комбинацией есть в базе, возвращает этого
   # пользователя. Если нет — возвращает nil.
   def self.authenticate(email, password)
-  # Сперва находим кандидата по email
+    # Сперва находим кандидата по email
     user = find_by(email: email&.downcase)
 
     # Если пользователь не найден, возвращает nil
