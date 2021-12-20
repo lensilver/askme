@@ -30,6 +30,13 @@ class UsersController < ApplicationController
   def edit
   end
 
+  def destroy
+    @user.destroy
+    session[:user_id] = nil
+    redirect_to root_path, notice: 'Профиль удален :('
+  end
+
+
   def update
     # пытаемся обновить юзера
     if @user.update(user_params)
