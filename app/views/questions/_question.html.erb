@@ -15,7 +15,11 @@
     <div class="question-date">
       <%= l(question.created_at, format: :short) %>
       Вопрос задал:
-      <%= link_to question.author.username, question.author %>
+      <% if question.author.present? %>
+        <%= link_to question.author.username, question.author %>            
+        <% else %>
+          Неизвестный
+        <% end %>  
     </div>
   </div>
 
